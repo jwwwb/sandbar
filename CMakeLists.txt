@@ -1,0 +1,5 @@
+cmake_minimum_required (VERSION 2.6)
+project (Sandbar)
+find_package(Qt5Widgets REQUIRED)
+add_executable(Sandbar trials.cpp MainWindow.cpp MainWindow.h)
+target_link_libraries(Sandbar Qt5::Widgets)
