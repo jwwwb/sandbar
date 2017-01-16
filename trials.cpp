@@ -6,6 +6,7 @@
 #include "trials.h"
 #include <QApplication>
 #include "MainWindow.h"
+#include "AudioPlayback.h"
 
 
 int main (int argc, char *argv[])
@@ -27,6 +28,12 @@ int main (int argc, char *argv[])
     else if (flag1.compare("-h") == 0)
     {
         printf("This will print the help file.\n");
+    }
+    else if (flag1.compare("-p") == 0)
+    {
+        printf("Playing test sound.\n");
+        AudioPlayback Player(1);
+        Player.playSine();
     }
     else
     {
