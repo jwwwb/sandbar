@@ -62,6 +62,7 @@ in one place, to avoid redundant code and adhere to MVC programming style.
 * renamePlaylist
 * changePlaylistCurrentEntry
 * changePlaybackOrder
+
 #### PlaybackController:
 * seekPlayback
 * play
