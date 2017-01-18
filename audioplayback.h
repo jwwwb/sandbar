@@ -1,9 +1,9 @@
 //
-// Created by ych on 17.10.16.
+// Created by jwwwb on 2016-10-17.
 //
 
-#ifndef SANDBAR_AUDIOPLAYBACK_H
-#define SANDBAR_AUDIOPLAYBACK_H
+#ifndef AUDIOPLAYBACK_H
+#define AUDIOPLAYBACK_H
 
 #include "portaudio.h"
 
@@ -15,17 +15,14 @@ typedef struct
 
 class AudioPlayback
 {
-    int space_filler;
     PaError err;
     static paTestData data;
     PaStream *stream;
 
 public:
-    AudioPlayback(int x);
+    AudioPlayback();
     void playSine();
     void closeStream();
-
 };
 
-
-#endif //SANDBAR_AUDIOPLAYBACK_H
+#endif // AUDIOPLAYBACK_H
