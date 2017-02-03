@@ -14,17 +14,21 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    audioplayback.cpp \
     model.cpp \
     playbackcontroller.cpp \
-    mediafile.cpp
+    mediafile.cpp \
+    portaudiointerface.cpp \
+    audiodecoder.cpp \
+    playlist.cpp
 
 HEADERS  += mainwindow.h \
-    audioplayback.h \
     model.h \
     playbackcontroller.h \
     mediafile.h \
-    globals.h
+    globals.h \
+    portaudiointerface.h \
+    audiodecoder.h \
+    playlist.h
 
 FORMS    += mainwindow.ui
 

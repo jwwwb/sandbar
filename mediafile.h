@@ -6,9 +6,25 @@
 #define MEDIAFILE_H
 
 #include <map>
+#include <stdio.h>
 #include <string>
 #include <QStringList>
 #include <QString>
+#include <QDebug>
+#include <QObject>
+#include <QMap>
+#include <sstream>
+#include <sys/stat.h>
+#include <time.h>
+extern "C" {
+#include <libavresample/avresample.h>
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+#include <libavutil/opt.h>
+#include <libavutil/mathematics.h>
+// for metadata
+#include <libavutil/dict.h>
+}
 
 enum MetaData {
     artistName,
@@ -24,8 +40,8 @@ enum MetaData {
     comment
 };
 
-enum fileData {
-    fileName,
+enum fileDataT {
+    fileName = 11,
     directoryName,
     filePath,
     fileSize,
@@ -33,30 +49,54 @@ enum fileData {
 };
 
 enum mediaData {
-    duration,
+    duration = 16,
     samples,
     sampleRate,
     channels,
     bitsPerSample,
     bitrate,
     codec,
-    encoding,
+    // TODO:
+            encoding,
     encoderTool,
     audioMD5
 };
 
+typedef struct IntString
+{
+    IntString(){
+        st = "";
+        in = 0;
+    }
+    IntString(QString str){
+        st = str;
+        in = 0;
+    }
+    IntString(int integer){
+        st = QString("%0").arg(integer);
+        in = integer;
+    }
+    IntString(QString str, qlonglong integer) {
+        st = str;
+        in = integer;
+    }
+    QString st;
+    qlonglong in;
+} IntString;
+
+
 class MediaFile
 {
 public:
-    MediaFile(std::string);
-    std::string location;
-    std::map<QString, std::string> allData;
+    MediaFile(QString location);
+    QString location;
+    QMap<QString, IntString> allData;
+    static QMap<QString, IntString> getData(const QString&);
 
 private:
-    void extractData();
-    void extractMetaData();
-    void extractMediaData();
-    void extractFileData();
+    static AVFormatContext* formatContext;
+    static AVDictionaryEntry *tag;
+    static AVCodecContext* codecContext;
 };
 
 #endif // MEDIAFILE_H

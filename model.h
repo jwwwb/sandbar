@@ -2,76 +2,68 @@
 // Created by jwwwb on 2017-01-16.
 //
 
-#include "model.h"
-#include <QDebug>
+#ifndef MODEL_H
+#define MODEL_H
 
-int Playlist::id = 0;
+// TODO: Q-ify this whole thing.
+// no more stdlib
 
-Playlist::Playlist(QString name)
+#include <QObject>
+#include <QSettings>
+#include <string>
+#include <vector>
+#include <QStringList>
+#include <QMap>
+#include <QtGlobal>
+#include <QList>
+#include <QCoreApplication>
+#include "mediafile.h"
+#include "playlist.h"
+
+class Model : public QObject
 {
-    identifier = Playlist::id++;
-    playlistName = name;
-}
+    Q_OBJECT
+public:
+    // constructor
+    Model();
 
-void Playlist::addMediaFile(MediaFile *mediaFile)
-{
-    this->MediaFiles.push_back(*mediaFile);
-}
+    // methods
+    void addToPlaylist(MediaFile *);
+    void changePlaybackOrder(QString);
+    void clearPlaylist();
+    QString newPlaylist();
+    void removePlaylist(int);
+    QString renamePlaylist(QString);
+    void switchPlaylist(int);
 
-MediaFile& Playlist::getCurrentEntry() {
-    return this->MediaFiles.at(currentEntry);
-}
+    // getters
+    Playlist& getInFocusPlaylist();
+    Playlist& getPlayingPlaylist();
+    int getInFocusPlaylistIndex();
+    int getPlayingPlaylistIndex();
 
-int Playlist::getIdentifier() { return this->identifier; }
-QString Playlist::getName() { return this->playlistName; }
-bool Playlist::empty() { return this->MediaFiles.empty(); }
-int Playlist::size() { return this->MediaFiles.size(); }
-void Playlist::clear() { this->MediaFiles.clear(); }
+private:
+    // properties
+    std::vector<Playlist> listOfPlaylists;
+    int playlistInFocus;
+    int entryNumSelected;
+    int playlistPlaying = -1;
+    int entryNumPlaying = -1;
 
-Model::Model()
-{
-    QString newName = "Default";
-    Playlist *emptyPlaylist = new Playlist(newName);
-    this->playlists.push_back(*emptyPlaylist);
-    playlistInFocus = 0;
-}
+    // methods
+    QStringList playlistNames();
+    QList<int> playlistIDs();
 
-void Model::addMediaFile(MediaFile *mediaFile)
-{
-    this->playlists.at(playlistInFocus).addMediaFile(mediaFile);
-}
+public slots:
+    void jumpToFile(int);
+    void requestCurrentFile();
+    void requestNextFile();
+    void requestPreviousFile();
+    void requestRandomFile();
 
-QString Model::newPlaylist()
-{
-    QString newName = "New Playlist";
-    for (Playlist list : this->playlists) {
-        if (list.getName() == newName) {
-            newName = "New Playlist (1)";
-        }
-    }
-    Playlist *emptyPlaylist = new Playlist(newName);
-    this->playlists.push_back(*emptyPlaylist);
-    playlistInFocus++;
-    return newName;
-}
+    signals:
+    void signalCurrentFile(QString location);
+    void signalNoMoreFiles();
+};
 
-void Model::clearPlaylist()
-{
-    this->getCurrentPlaylist().clear();
-}
-
-Playlist& Model::getCurrentPlaylist()
-{
-    return this->playlists.at(playlistInFocus);
-}
-
-MediaFile& Model::getCurrentEntry()
-{
-    return this->getCurrentPlaylist().getCurrentEntry();
-}
-
-QStringList Model::getPlaylistSettings()
-{
-    static QStringList playSet = QStringList() << "fileName" << "filePath" << "duration" << "directoryName";
-    return playSet;
-}
+#endif // MODEL_H
