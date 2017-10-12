@@ -554,6 +554,9 @@
        </spacer>
       </item>
       <item>
+       <widget class="QWidget" name="widget" native="true"/>
+      </item>
+      <item>
        <widget class="QTabWidget" name="playlistTabs">
         <property name="currentIndex">
          <number>-1</number>
@@ -564,6 +567,61 @@
         <property name="tabsClosable">
          <bool>true</bool>
         </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTableWidget" name="playlistTableWidget">
+        <property name="acceptDrops">
+         <bool>true</bool>
+        </property>
+        <property name="dragEnabled">
+         <bool>true</bool>
+        </property>
+        <property name="dragDropMode">
+         <enum>QAbstractItemView::InternalMove</enum>
+        </property>
+        <property name="alternatingRowColors">
+         <bool>true</bool>
+        </property>
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectRows</enum>
+        </property>
+        <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="verticalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+        <column>
+         <property name="text">
+          <string>Playing</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>New Column</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Artist Name</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Track Title</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Album Title</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>File Path</string>
+         </property>
+        </column>
        </widget>
       </item>
      </layout>

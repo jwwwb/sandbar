@@ -1,0 +1,289 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+AUDIODECODER_H	audiodecoder.h	/^#define AUDIODECODER_H$/;"	d
+AUDIOPLAYBACK_H	audioplayback.h	/^#define AUDIOPLAYBACK_H$/;"	d
+AudioDecoder	audiodecoder.cpp	/^AudioDecoder::AudioDecoder()$/;"	f	class:AudioDecoder
+AudioDecoder	audiodecoder.h	/^class AudioDecoder : public QObject$/;"	c
+AudioPlayback	audioplayback.cpp	/^AudioPlayback::AudioPlayback()$/;"	f	class:AudioPlayback
+AudioPlayback	audioplayback.h	/^class AudioPlayback : public QObject$/;"	c
+FILEREADER_H	filereader.h	/^#define FILEREADER_H$/;"	d
+FileReader	filereader.h	/^class FileReader : public QObject$/;"	c
+GLOBALS_H	globals.h	/^#define GLOBALS_H$/;"	d
+IntString	mediafile.h	/^    IntString(){$/;"	f	struct:IntString
+IntString	mediafile.h	/^    IntString(QString str){$/;"	f	struct:IntString
+IntString	mediafile.h	/^    IntString(QString str, qlonglong integer) {$/;"	f	struct:IntString
+IntString	mediafile.h	/^    IntString(int integer){$/;"	f	struct:IntString
+IntString	mediafile.h	/^typedef struct IntString$/;"	s
+IntString	mediafile.h	/^} IntString;$/;"	t	typeref:struct:IntString
+MAINWINDOW_H	mainwindow.h	/^#define MAINWINDOW_H$/;"	d
+MEDIAFILE_H	mediafile.h	/^#define MEDIAFILE_H$/;"	d
+MODEL_H	model.h	/^#define MODEL_H$/;"	d
+MainWindow	mainwindow.cpp	/^MainWindow::MainWindow(QWidget *parent) :$/;"	f	class:MainWindow
+MainWindow	mainwindow.h	/^class MainWindow : public QMainWindow$/;"	c
+MediaFile	mediafile.cpp	/^MediaFile::MediaFile(QString location)$/;"	f	class:MediaFile
+MediaFile	mediafile.h	/^class MediaFile$/;"	c
+MetaData	mediafile.h	/^enum MetaData {$/;"	g
+Model	model.cpp	/^Model::Model()$/;"	f	class:Model
+Model	model.h	/^class Model : public QObject$/;"	c
+NUM_SECONDS	audioplayback.cpp	/^#define NUM_SECONDS /;"	d	file:
+PLAYBACKCONTROLLER_H	playbackcontroller.h	/^#define PLAYBACKCONTROLLER_H$/;"	d
+PLAYLIST_H	playlist.h	/^#define PLAYLIST_H$/;"	d
+PORTAUDIOINTERFACE_H	portaudiointerface.h	/^#define PORTAUDIOINTERFACE_H$/;"	d
+PlaybackController	playbackcontroller.cpp	/^PlaybackController::PlaybackController()$/;"	f	class:PlaybackController
+PlaybackController	playbackcontroller.h	/^class PlaybackController : public QObject$/;"	c
+Playlist	playlist.cpp	/^Playlist::Playlist(QString name)$/;"	f	class:Playlist
+Playlist	playlist.h	/^class Playlist$/;"	c
+PortAudioInterface	portaudiointerface.cpp	/^PortAudioInterface::PortAudioInterface(bufferQueue *buffer)$/;"	f	class:PortAudioInterface
+PortAudioInterface	portaudiointerface.h	/^class PortAudioInterface : public QObject$/;"	c
+SAMPLE	portaudiointerface.h	/^typedef int_fast16_t SAMPLE;$/;"	t
+Ui	mainwindow.h	/^namespace Ui {$/;"	n
+addToPlaylist	model.cpp	/^void Model::addToPlaylist(MediaFile *mediaFile)$/;"	f	class:Model
+albumArtist	mediafile.h	/^    albumArtist,$/;"	e	enum:MetaData
+albumTitle	mediafile.h	/^    albumTitle,$/;"	e	enum:MetaData
+allData	mediafile.h	/^    QMap<QString, IntString> allData;$/;"	m	class:MediaFile
+append	playlist.cpp	/^void Playlist::append(MediaFile *file) { mediaFiles.append(file); }$/;"	f	class:Playlist
+artistName	mediafile.h	/^    artistName,$/;"	e	enum:MetaData
+audioMD5	mediafile.h	/^    audioMD5$/;"	e	enum:mediaData
+audioStream	audiodecoder.h	/^    int audioStream = -1;$/;"	m	class:AudioDecoder
+audio_context_	audioplayback.h	/^    AVFormatContext* audio_context_ = NULL;$/;"	m	class:AudioPlayback
+avTimeBaseToUSec	globals.h	/^const double avTimeBaseToUSec = 1.0;$/;"	v
+bitrate	mediafile.h	/^    bitrate,$/;"	e	enum:mediaData
+bitsPerSample	mediafile.h	/^    bitsPerSample,$/;"	e	enum:mediaData
+buffer	portaudiointerface.h	/^    SAMPLE *buffer [4];     \/\/ each item in a buffer is 16 bits$/;"	m	struct:__anon1
+bufferData	audiodecoder.h	/^    bufferQueue bufferData; \/\/ this guy owns the data? we'll see.$/;"	m	class:AudioDecoder
+bufferLen	portaudiointerface.h	/^    uint32_t bufferLen [4];     \/\/ but the len is measured in multiples of 32bit$/;"	m	struct:__anon1
+bufferQueue	portaudiointerface.h	/^} bufferQueue;$/;"	t	typeref:struct:__anon1
+bufferStruct	filereader.h	/^    paRingBuffer *bufferStruct;$/;"	m	class:FileReader
+cache_duration	globals.h	/^const int cache_duration = samples_per_buffer*outSamplesToUSec; \/\/ in usec.$/;"	v
+changePlaybackOrder	model.cpp	/^void Model::changePlaybackOrder(int order)$/;"	f	class:Model
+channels	mediafile.h	/^    channels,$/;"	e	enum:mediaData
+clear	playlist.cpp	/^void Playlist::clear() { this->mediaFiles.clear(); }$/;"	f	class:Playlist
+clearPlaylist	model.cpp	/^void Model::clearPlaylist()$/;"	f	class:Model
+closeStream	audioplayback.cpp	/^void AudioPlayback::closeStream(){$/;"	f	class:AudioPlayback
+codec	filereader.h	/^    AVCodec* codec = NULL;$/;"	m	class:FileReader
+codec	mediafile.h	/^    codec,$/;"	e	enum:mediaData
+codecContext	audiodecoder.h	/^    AVCodecContext* codecContext = NULL;$/;"	m	class:AudioDecoder
+codecContext	filereader.h	/^    AVCodecContext* codecContext = NULL;$/;"	m	class:FileReader
+codecContext	mediafile.cpp	/^AVCodecContext* MediaFile::codecContext = NULL;$/;"	m	class:MediaFile	file:
+codecContext	mediafile.h	/^    static AVCodecContext* codecContext;$/;"	m	class:MediaFile
+codec_	audioplayback.h	/^    AVCodec* codec_ = NULL;$/;"	m	class:AudioPlayback
+codec_context_	audioplayback.h	/^    AVCodecContext* codec_context_ = NULL;$/;"	m	class:AudioPlayback
+comment	mediafile.h	/^    comment$/;"	e	enum:MetaData
+connectSignals	mainwindow.cpp	/^void MainWindow::connectSignals()$/;"	f	class:MainWindow
+currentProgress	playbackcontroller.h	/^    qlonglong currentProgress;$/;"	m	class:PlaybackController
+currentTime	audiodecoder.h	/^    qlonglong currentTime;$/;"	m	class:AudioDecoder
+data	audioplayback.h	/^    paPlayData data;$/;"	m	class:AudioPlayback
+dataPointer	playbackcontroller.h	/^    bufferQueue *dataPointer;$/;"	m	class:PlaybackController
+dataPointer	portaudiointerface.h	/^    bufferQueue *dataPointer;$/;"	m	class:PortAudioInterface
+date	mediafile.h	/^    date,$/;"	e	enum:MetaData
+deCodec	audiodecoder.h	/^    AVCodec* deCodec = NULL;$/;"	m	class:AudioDecoder
+decoder	playbackcontroller.h	/^    AudioDecoder *decoder;$/;"	m	class:PlaybackController
+decoderThread	audiodecoder.h	/^    QThread decoderThread;$/;"	m	class:AudioDecoder
+decoderThread	playbackcontroller.h	/^    QThread decoderThread;$/;"	m	class:PlaybackController
+deletePlaylist	mainwindow.cpp	/^void MainWindow::deletePlaylist(int index)$/;"	f	class:MainWindow
+directoryName	mediafile.h	/^    directoryName,$/;"	e	enum:fileDataT
+discNumber	mediafile.h	/^    discNumber,$/;"	e	enum:MetaData
+duration	audiodecoder.h	/^    qlonglong duration;$/;"	m	class:AudioDecoder
+duration	mediafile.h	/^    duration = 16,$/;"	e	enum:mediaData
+empty	playlist.cpp	/^bool Playlist::empty() { return this->mediaFiles.empty(); }$/;"	f	class:Playlist
+encoderTool	mediafile.h	/^    encoderTool,$/;"	e	enum:mediaData
+encoding	mediafile.h	/^    encoding,$/;"	e	enum:mediaData
+entryNumPlaying	model.h	/^    int entryNumPlaying = -1;$/;"	m	class:Model
+entryNumSelected	model.h	/^    int entryNumSelected;$/;"	m	class:Model
+err	audioplayback.h	/^    PaError err;$/;"	m	class:AudioPlayback
+err	portaudiointerface.h	/^    PaError err;$/;"	m	class:PortAudioInterface
+fileDataT	mediafile.h	/^enum fileDataT {$/;"	g
+fileDuration	playbackcontroller.h	/^    qlonglong fileDuration;$/;"	m	class:PlaybackController
+fileName	mediafile.h	/^    fileName = 11,$/;"	e	enum:fileDataT
+fileOpen	audiodecoder.h	/^    int fileOpen = 0;$/;"	m	class:AudioDecoder
+filePath	mediafile.h	/^    filePath,$/;"	e	enum:fileDataT
+fileSize	mediafile.h	/^    fileSize,$/;"	e	enum:fileDataT
+fillUpBuffer	audiodecoder.cpp	/^void AudioDecoder::fillUpBuffer(int switchBuffer = 0)$/;"	f	class:AudioDecoder
+finishFile	audiodecoder.cpp	/^void AudioDecoder::finishFile()$/;"	f	class:AudioDecoder
+formatContext	audiodecoder.h	/^    AVFormatContext* formatContext = NULL;$/;"	m	class:AudioDecoder
+formatContext	filereader.h	/^    AVFormatContext* formatContext = NULL;$/;"	m	class:FileReader
+formatContext	mediafile.cpp	/^AVFormatContext* MediaFile::formatContext = NULL;$/;"	m	class:MediaFile	file:
+formatContext	mediafile.h	/^    static AVFormatContext* formatContext;$/;"	m	class:MediaFile
+frameIndex	audioplayback.h	/^    qlonglong    frameIndex;  \/* Index into sample array. *\/$/;"	m	struct:paPlayData
+freezeUpdates	mainwindow.h	/^    int freezeUpdates = 0;$/;"	m	class:MainWindow
+frm	audiodecoder.h	/^    AVFrame* frm;$/;"	m	class:AudioDecoder
+frm	filereader.h	/^    AVFrame* frm;$/;"	m	class:FileReader
+generateShuffleOrder	model.cpp	/^void Model::generateShuffleOrder(int playlistNum)$/;"	f	class:Model
+genre	mediafile.h	/^    genre,$/;"	e	enum:MetaData
+getData	mediafile.cpp	/^QMap<QString, IntString> MediaFile::getData(const QString& location)$/;"	f	class:MediaFile
+getDataAddress	audiodecoder.cpp	/^bufferQueue * AudioDecoder::getDataAddress()$/;"	f	class:AudioDecoder
+getDuration	playbackcontroller.cpp	/^qlonglong PlaybackController::getDuration()$/;"	f	class:PlaybackController
+getEntryAt	playlist.cpp	/^MediaFile * Playlist::getEntryAt(int index) { return mediaFiles.at(index); }$/;"	f	class:Playlist
+getIdentifier	playlist.cpp	/^int Playlist::getIdentifier() { return identifier; }$/;"	f	class:Playlist
+getInFocusPlaylist	model.cpp	/^Playlist& Model::getInFocusPlaylist()$/;"	f	class:Model
+getInFocusPlaylistIndex	model.cpp	/^int Model::getInFocusPlaylistIndex() {$/;"	f	class:Model
+getName	playlist.cpp	/^QString Playlist::getName() { return this->playlistName; }$/;"	f	class:Playlist
+getPlayingPlaylist	model.cpp	/^Playlist& Model::getPlayingPlaylist()$/;"	f	class:Model
+getPlayingPlaylistIndex	model.cpp	/^int Model::getPlayingPlaylistIndex() {$/;"	f	class:Model
+getSelectedInPlaylist	mainwindow.cpp	/^QList<int> MainWindow::getSelectedInPlaylist()$/;"	f	class:MainWindow
+getTime	audiodecoder.cpp	/^qlonglong AudioDecoder::getTime()$/;"	f	class:AudioDecoder
+getVolume	audioplayback.cpp	/^double AudioPlayback::getVolume()$/;"	f	class:AudioPlayback
+id	playlist.cpp	/^int Playlist::id = 0;$/;"	m	class:Playlist	file:
+id	playlist.h	/^    static int id; \/\/ TODO do something with this$/;"	m	class:Playlist
+identifier	playlist.h	/^    int identifier;$/;"	m	class:Playlist
+in	mediafile.h	/^    qlonglong in;$/;"	m	struct:IntString
+initalizePlaylistTable	mainwindow.cpp	/^void MainWindow::initalizePlaylistTable()$/;"	f	class:MainWindow
+initialized	audiodecoder.h	/^    int initialized = 0;$/;"	m	class:AudioDecoder
+insert	playlist.cpp	/^void Playlist::insert(MediaFile *file, int at) { mediaFiles.insert(at, file); }$/;"	f	class:Playlist
+jumpToFile	model.cpp	/^void Model::jumpToFile(int row)$/;"	f	class:Model
+lastModified	mediafile.h	/^    lastModified$/;"	e	enum:fileDataT
+listOfPlaylistIDs	mainwindow.h	/^    std::vector<int> listOfPlaylistIDs;$/;"	m	class:MainWindow
+listOfPlaylistNames	mainwindow.h	/^    std::vector<QString> listOfPlaylistNames;$/;"	m	class:MainWindow
+listOfPlaylists	model.h	/^    std::vector<Playlist> listOfPlaylists;$/;"	m	class:Model
+loadFile	audiodecoder.cpp	/^qlonglong AudioDecoder::loadFile(const QString &fileName) {$/;"	f	class:AudioDecoder
+location	mediafile.h	/^    QString location;$/;"	m	class:MediaFile
+main	main.cpp	/^int main(int argc, char *argv[])$/;"	f
+maxFrameIndex	audioplayback.h	/^    qlonglong    maxFrameIndex;$/;"	m	struct:paPlayData
+mediaData	mediafile.h	/^enum mediaData {$/;"	g
+mediaFiles	playlist.h	/^    QList<MediaFile *> mediaFiles;$/;"	m	class:Playlist
+model	mainwindow.h	/^    Model *model;$/;"	m	class:MainWindow
+newPlaylist	mainwindow.cpp	/^void MainWindow::newPlaylist()$/;"	f	class:MainWindow
+newPlaylist	model.cpp	/^QString Model::newPlaylist()$/;"	f	class:Model
+nextReadBuffer	portaudiointerface.h	/^    uint8_t readBuffer, nextReadBuffer, writeBuffer, switchBuffer;$/;"	m	struct:__anon1
+num_buffers	globals.h	/^const int num_buffers = 4;$/;"	v
+num_channels	globals.h	/^const int num_channels = 2;$/;"	v
+on_actionAdd_File_triggered	mainwindow.cpp	/^void MainWindow::on_actionAdd_File_triggered()$/;"	f	class:MainWindow
+on_actionNew_Playlist_triggered	mainwindow.cpp	/^void MainWindow::on_actionNew_Playlist_triggered()$/;"	f	class:MainWindow
+on_actionOpen_triggered	mainwindow.cpp	/^void MainWindow::on_actionOpen_triggered()$/;"	f	class:MainWindow
+on_playlistTabs_currentChanged	mainwindow.cpp	/^void MainWindow::on_playlistTabs_currentChanged(int index)$/;"	f	class:MainWindow
+on_playlistTabs_tabBarDoubleClicked	mainwindow.cpp	/^void MainWindow::on_playlistTabs_tabBarDoubleClicked(int index)$/;"	f	class:MainWindow
+on_playlistTabs_tabCloseRequested	mainwindow.cpp	/^void MainWindow::on_playlistTabs_tabCloseRequested(int index)$/;"	f	class:MainWindow
+on_progressSlider_sliderPressed	mainwindow.cpp	/^void MainWindow::on_progressSlider_sliderPressed()$/;"	f	class:MainWindow
+on_progressSlider_sliderReleased	mainwindow.cpp	/^void MainWindow::on_progressSlider_sliderReleased()$/;"	f	class:MainWindow
+on_pushButtonClear_clicked	mainwindow.cpp	/^void MainWindow::on_pushButtonClear_clicked()$/;"	f	class:MainWindow
+on_pushButtonHello_clicked	mainwindow.cpp	/^void MainWindow::on_pushButtonHello_clicked()$/;"	f	class:MainWindow
+on_pushButtonNext_clicked	mainwindow.cpp	/^void MainWindow::on_pushButtonNext_clicked()$/;"	f	class:MainWindow
+on_pushButtonPause_clicked	mainwindow.cpp	/^void MainWindow::on_pushButtonPause_clicked()$/;"	f	class:MainWindow
+on_pushButtonPlay_clicked	mainwindow.cpp	/^void MainWindow::on_pushButtonPlay_clicked()$/;"	f	class:MainWindow
+on_pushButtonPrevious_clicked	mainwindow.cpp	/^void MainWindow::on_pushButtonPrevious_clicked()$/;"	f	class:MainWindow
+on_pushButtonRandom_clicked	mainwindow.cpp	/^void MainWindow::on_pushButtonRandom_clicked()$/;"	f	class:MainWindow
+on_pushButtonStop_clicked	mainwindow.cpp	/^void MainWindow::on_pushButtonStop_clicked()$/;"	f	class:MainWindow
+on_volumeSlider_sliderMoved	mainwindow.cpp	/^void MainWindow::on_volumeSlider_sliderMoved(int position)$/;"	f	class:MainWindow
+openFile	audioplayback.cpp	/^void AudioPlayback::openFile(const QString &fileName)$/;"	f	class:AudioPlayback
+outSampleIndexToTrackTimeBase	portaudiointerface.h	/^    float outSampleIndexToTrackTimeBase;$/;"	m	struct:__anon1
+outSamplesToUSec	globals.h	/^const double outSamplesToUSec = 1000000.0\/sample_rate;$/;"	v
+out_linesize	audiodecoder.h	/^    int out_linesize; \/\/ Used internally by libAV.$/;"	m	class:AudioDecoder
+out_linesize	filereader.h	/^    int out_linesize; \/\/ Used internally by libAV.$/;"	m	class:FileReader
+out_sample_fmt	audiodecoder.h	/^    qlonglong out_sample_fmt; \/\/ Bit-depth.$/;"	m	class:AudioDecoder
+out_sample_fmt	filereader.h	/^    int64_t out_sample_fmt; \/\/ Bit-depth.$/;"	m	class:FileReader
+out_samples	audiodecoder.h	/^    int out_samples; \/\/ How many samples we will play, AFTER resampling.$/;"	m	class:AudioDecoder
+out_samples	filereader.h	/^    int out_samples; \/\/ How many samples we will play, AFTER resampling.$/;"	m	class:FileReader
+output	audiodecoder.h	/^    uint8_t *output; \/\/ This is the audio data buffer. av_samples_alloc wants uint8_t$/;"	m	class:AudioDecoder
+output	filereader.h	/^    uint8_t *output; \/\/ This is the audio data buffer.$/;"	m	class:FileReader
+paPlayCallback	audioplayback.cpp	/^static int paPlayCallback( const void *inputBuffer, void *outputBuffer,$/;"	f	file:
+paPlayData	audioplayback.h	/^typedef struct paPlayData {$/;"	s
+paPlayData	audioplayback.h	/^} paPlayData;$/;"	t	typeref:struct:paPlayData
+paQueueCallback	portaudiointerface.cpp	/^static int paQueueCallback( const void *inputBuffer, void *outputBuffer,$/;"	f	file:
+pausePushed	playbackcontroller.cpp	/^void PlaybackController::pausePushed()$/;"	f	class:PlaybackController
+paused	playbackcontroller.h	/^    int paused;$/;"	m	class:PlaybackController
+pkt	audiodecoder.h	/^    AVPacket pkt;$/;"	m	class:AudioDecoder
+pkt	filereader.h	/^    AVPacket pkt;$/;"	m	class:FileReader
+playFile	audioplayback.cpp	/^void AudioPlayback::playFile(){$/;"	f	class:AudioPlayback
+playPlaylistEntry	mainwindow.cpp	/^void MainWindow::playPlaylistEntry()$/;"	f	class:MainWindow
+playPushed	playbackcontroller.cpp	/^void PlaybackController::playPushed()$/;"	f	class:PlaybackController
+playback	mainwindow.h	/^    PlaybackController *playback;$/;"	m	class:MainWindow
+playlistIDs	model.cpp	/^QList<int> Model::playlistIDs()$/;"	f	class:Model
+playlistInFocus	mainwindow.h	/^    int playlistInFocus;$/;"	m	class:MainWindow
+playlistInFocus	model.h	/^    int playlistInFocus;$/;"	m	class:Model
+playlistName	playlist.h	/^    QString playlistName;$/;"	m	class:Playlist
+playlistNames	model.cpp	/^QStringList Model::playlistNames()$/;"	f	class:Model
+playlistPlaying	model.h	/^    int playlistPlaying = -1;$/;"	m	class:Model
+playlistTableWidget	mainwindow.h	/^    QTableWidget *playlistTableWidget; \/\/ just one now, that moves.$/;"	m	class:MainWindow
+positionInFile	portaudiointerface.h	/^    qlonglong positionInFile [4];    \/\/ now indicates position in usecs.$/;"	m	struct:__anon1
+readAudioFile	audioplayback.cpp	/^void AudioPlayback::readAudioFile()$/;"	f	class:AudioPlayback
+readBuffer	portaudiointerface.h	/^    uint8_t readBuffer, nextReadBuffer, writeBuffer, switchBuffer;$/;"	m	struct:__anon1
+readIndex	portaudiointerface.h	/^    uint32_t readIndex; \/\/ and these indices also indicate 32 bit jumps$/;"	m	struct:__anon1
+readNextPacket	audiodecoder.cpp	/^int AudioDecoder::readNextPacket()$/;"	f	class:AudioDecoder
+recordedSamples	audioplayback.h	/^    int_fast16_t *recordedSamples;$/;"	m	struct:paPlayData
+removePlaylist	model.cpp	/^void Model::removePlaylist(int index) {$/;"	f	class:Model
+renamePlaylist	model.cpp	/^QString Model::renamePlaylist(QString newName) {$/;"	f	class:Model
+repeatOn	model.h	/^    int repeatOn;$/;"	m	class:Model
+requestCurrentFile	model.cpp	/^void Model::requestCurrentFile()$/;"	f	class:Model
+requestNextFile	model.cpp	/^void Model::requestNextFile()$/;"	f	class:Model
+requestPreviousFile	model.cpp	/^void Model::requestPreviousFile()$/;"	f	class:Model
+requestRandomFile	model.cpp	/^void Model::requestRandomFile()$/;"	f	class:Model
+resampleContext	audiodecoder.h	/^    AVAudioResampleContext* resampleContext = NULL;$/;"	m	class:AudioDecoder
+resampleContext	filereader.h	/^    AVAudioResampleContext* resampleContext = NULL;$/;"	m	class:FileReader
+resample_context_	audioplayback.h	/^    AVAudioResampleContext* resample_context_ = NULL;$/;"	m	class:AudioPlayback
+rightClickPlaylist	mainwindow.cpp	/^void MainWindow::rightClickPlaylist(const QPoint & pos)$/;"	f	class:MainWindow
+sampleRate	mediafile.h	/^    sampleRate,$/;"	e	enum:mediaData
+sample_rate	globals.h	/^const double sample_rate = 44100.0;$/;"	v
+samples	mediafile.h	/^    samples,$/;"	e	enum:mediaData
+samples_per_buffer	globals.h	/^const int samples_per_buffer = 262144; \/\/ might be too big, who cares, it's just 64k$/;"	v
+seekDifferential	playbackcontroller.cpp	/^void PlaybackController::seekDifferential(qlonglong diff)$/;"	f	class:PlaybackController
+seekFile	playbackcontroller.cpp	/^void PlaybackController::seekFile(qlonglong seekto)$/;"	f	class:PlaybackController
+setName	playlist.cpp	/^void Playlist::setName(QString newName) { playlistName = newName; }$/;"	f	class:Playlist
+setVolume	audioplayback.cpp	/^void AudioPlayback::setVolume(double newVolume)$/;"	f	class:AudioPlayback
+setVolume	playbackcontroller.cpp	/^void PlaybackController::setVolume(float volumeMultiplier) {$/;"	f	class:PlaybackController
+setVolume	playbackcontroller.cpp	/^void PlaybackController::setVolume(int decibels) {$/;"	f	class:PlaybackController
+setupResampler	audioplayback.cpp	/^void AudioPlayback::setupResampler()$/;"	f	class:AudioPlayback
+shuffleOn	model.h	/^    int shuffleOn;$/;"	m	class:Model
+shuffleOrders	model.h	/^    std::vector<std::vector<int> > shuffleOrders;$/;"	m	class:Model
+shuffledEntryNumPlaying	model.h	/^    int shuffledEntryNumPlaying = -1;$/;"	m	class:Model
+size	playlist.cpp	/^int Playlist::size() { return this->mediaFiles.size(); }$/;"	f	class:Playlist
+sliderStepToUSec	globals.h	/^const double sliderStepToUSec = 100000.0;$/;"	v
+slotAbortStream	portaudiointerface.cpp	/^void PortAudioInterface::slotAbortStream()$/;"	f	class:PortAudioInterface
+slotCloseStream	portaudiointerface.cpp	/^void PortAudioInterface::slotCloseStream()$/;"	f	class:PortAudioInterface
+slotColumnResized	mainwindow.cpp	/^void MainWindow::slotColumnResized(int idx, int oldsize, int newsize)$/;"	f	class:MainWindow
+slotDuration	mainwindow.cpp	/^void MainWindow::slotDuration(qlonglong duration)$/;"	f	class:MainWindow
+slotDuration	playbackcontroller.cpp	/^void PlaybackController::slotDuration(qlonglong duration)$/;"	f	class:PlaybackController
+slotEnsureStarted	portaudiointerface.cpp	/^void PortAudioInterface::slotEnsureStarted()$/;"	f	class:PortAudioInterface
+slotEnsureStopped	portaudiointerface.cpp	/^void PortAudioInterface::slotEnsureStopped()$/;"	f	class:PortAudioInterface
+slotFile	audiodecoder.cpp	/^void AudioDecoder::slotFile(const QString &fileName)$/;"	f	class:AudioDecoder
+slotInitialize	audiodecoder.cpp	/^void AudioDecoder::slotInitialize()$/;"	f	class:AudioDecoder
+slotInitialize	portaudiointerface.cpp	/^void PortAudioInterface::slotInitialize()$/;"	f	class:PortAudioInterface
+slotOpenStream	portaudiointerface.cpp	/^void PortAudioInterface::slotOpenStream()$/;"	f	class:PortAudioInterface
+slotPlay	audiodecoder.cpp	/^void AudioDecoder::slotPlay()$/;"	f	class:AudioDecoder
+slotPlaybackEnded	mainwindow.cpp	/^void MainWindow::slotPlaybackEnded()$/;"	f	class:MainWindow
+slotPlaybackProgress	mainwindow.cpp	/^void MainWindow::slotPlaybackProgress(qlonglong timePlayed)$/;"	f	class:MainWindow
+slotPlaybackProgress	playbackcontroller.cpp	/^void PlaybackController::slotPlaybackProgress(qlonglong timePlayed)$/;"	f	class:PlaybackController
+slotSeekTo	audiodecoder.cpp	/^void AudioDecoder::slotSeekTo(qlonglong time)$/;"	f	class:AudioDecoder
+slotSetVolume	audiodecoder.cpp	/^void AudioDecoder::slotSetVolume(float newVolume)$/;"	f	class:AudioDecoder
+slotStartStream	portaudiointerface.cpp	/^void PortAudioInterface::slotStartStream()$/;"	f	class:PortAudioInterface
+slotStop	audiodecoder.cpp	/^void AudioDecoder::slotStop()$/;"	f	class:AudioDecoder
+slotStopStream	portaudiointerface.cpp	/^void PortAudioInterface::slotStopStream()$/;"	f	class:PortAudioInterface
+slotTerminate	portaudiointerface.cpp	/^void PortAudioInterface::slotTerminate()$/;"	f	class:PortAudioInterface
+slotTryToProgress	audiodecoder.cpp	/^void AudioDecoder::slotTryToProgress()$/;"	f	class:AudioDecoder
+st	mediafile.h	/^    QString st;$/;"	m	struct:IntString
+stopPlay	audioplayback.cpp	/^void AudioPlayback::stopPlay(){$/;"	f	class:AudioPlayback
+stopPushed	playbackcontroller.cpp	/^void PlaybackController::stopPushed()$/;"	f	class:PlaybackController
+stream	audioplayback.h	/^    PaStream *stream;$/;"	m	class:AudioPlayback
+stream	portaudiointerface.h	/^    PaStream *stream;$/;"	m	class:PortAudioInterface
+streamer	playbackcontroller.h	/^    PortAudioInterface *streamer;$/;"	m	class:PlaybackController
+switchBuffer	portaudiointerface.h	/^    uint8_t readBuffer, nextReadBuffer, writeBuffer, switchBuffer;$/;"	m	struct:__anon1
+switchPlaylist	model.cpp	/^void Model::switchPlaylist(int newIndex) {$/;"	f	class:Model
+tag	mediafile.cpp	/^AVDictionaryEntry *MediaFile::tag = NULL;$/;"	m	class:MediaFile	file:
+tag	mediafile.h	/^    static AVDictionaryEntry *tag;$/;"	m	class:MediaFile
+timeBase	globals.h	/^const int timeBase = 1000000;   \/\/ my own timebase, just so happens to be the same as AV's$/;"	v
+timer	audiodecoder.h	/^    QTimer *timer;$/;"	m	class:AudioDecoder
+timer_period	globals.h	/^const int timer_period = 200;   \/\/ in msec$/;"	v
+totalDiscs	mediafile.h	/^    totalDiscs,$/;"	e	enum:MetaData
+totalTracks	mediafile.h	/^    totalTracks,$/;"	e	enum:MetaData
+trackNumber	mediafile.h	/^    trackNumber,$/;"	e	enum:MetaData
+trackTimeBaseToOutSampleIndex	portaudiointerface.h	/^    float trackTimeBaseToOutSampleIndex;$/;"	m	struct:__anon1
+trackTimeBaseToUSec	portaudiointerface.h	/^    float trackTimeBaseToUSec;$/;"	m	struct:__anon1
+trackTitle	mediafile.h	/^    trackTitle,$/;"	e	enum:MetaData
+uSecToAvTimeBase	globals.h	/^const double uSecToAvTimeBase = 1.0;$/;"	v
+uSecToOutSamples	globals.h	/^const double uSecToOutSamples = sample_rate\/1000000.0;$/;"	v
+uSecToSliderStep	globals.h	/^const double uSecToSliderStep = 1.0\/100000.0;$/;"	v
+uSecToTrackTimeBase	portaudiointerface.h	/^    float uSecToTrackTimeBase;$/;"	m	struct:__anon1
+ui	mainwindow.h	/^    Ui::MainWindow *ui;$/;"	m	class:MainWindow
+updatePlaylist	mainwindow.cpp	/^void MainWindow::updatePlaylist()$/;"	f	class:MainWindow
+volume	audioplayback.cpp	/^double AudioPlayback::volume = 1.0;$/;"	m	class:AudioPlayback	file:
+volume	audioplayback.h	/^    static double volume;$/;"	m	class:AudioPlayback
+volume	portaudiointerface.h	/^    float volume;$/;"	m	struct:__anon1
+volumeMultiplier	playbackcontroller.h	/^    float volumeMultiplier;$/;"	m	class:PlaybackController
+writeBuffer	portaudiointerface.h	/^    uint8_t readBuffer, nextReadBuffer, writeBuffer, switchBuffer;$/;"	m	struct:__anon1
+~AudioDecoder	audiodecoder.cpp	/^AudioDecoder::~AudioDecoder() {$/;"	f	class:AudioDecoder
+~AudioPlayback	audioplayback.cpp	/^AudioPlayback::~AudioPlayback()$/;"	f	class:AudioPlayback
+~MainWindow	mainwindow.cpp	/^MainWindow::~MainWindow()$/;"	f	class:MainWindow
+~PlaybackController	playbackcontroller.cpp	/^PlaybackController::~PlaybackController()$/;"	f	class:PlaybackController

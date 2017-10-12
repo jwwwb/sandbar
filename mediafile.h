@@ -57,7 +57,7 @@ enum mediaData {
     bitrate,
     codec,
     // TODO:
-            encoding,
+    encoding,
     encoderTool,
     audioMD5
 };

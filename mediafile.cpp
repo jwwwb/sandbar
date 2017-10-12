@@ -55,7 +55,7 @@ QMap<QString, IntString> MediaFile::getData(const QString& location)
         while ((tag = av_dict_get(formatContext->metadata, "", tag, AV_DICT_IGNORE_SUFFIX))) {
             // I don't think I can do case/switch here, C only supports ints
             if (!QString::compare(tag->key, "album", Qt::CaseInsensitive) ||
-                !QString::compare(tag->key, "album title", Qt::CaseInsensitive)) {
+                    !QString::compare(tag->key, "album title", Qt::CaseInsensitive)) {
                 allData["Album Title"] = IntString(QString(tag->value));
             } else if (!QString::compare(tag->key, "artist", Qt::CaseInsensitive)) {
                 allData["Artist Name"] = IntString(QString(tag->value));

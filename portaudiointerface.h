@@ -24,6 +24,7 @@ typedef struct {
     SAMPLE *buffer [4];     // each item in a buffer is 16 bits
     uint32_t bufferLen [4];     // but the len is measured in multiples of 32bit
     uint32_t readIndex; // and these indices also indicate 32 bit jumps
+    int32_t fileChangeIndex;
     uint8_t readBuffer, nextReadBuffer, writeBuffer, switchBuffer;
     qlonglong positionInFile [4];    // now indicates position in usecs.
     float trackTimeBaseToOutSampleIndex;
@@ -31,6 +32,7 @@ typedef struct {
     float trackTimeBaseToUSec;
     float uSecToTrackTimeBase;
     float volume;
+
 } bufferQueue;
 
 class PortAudioInterface : public QObject

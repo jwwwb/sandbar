@@ -10,6 +10,7 @@
 
 #include <QObject>
 #include <QSettings>
+#include <algorithm>
 #include <string>
 #include <vector>
 #include <QStringList>
@@ -29,7 +30,7 @@ public:
 
     // methods
     void addToPlaylist(MediaFile *);
-    void changePlaybackOrder(QString);
+    void changePlaybackOrder(int);
     void clearPlaylist();
     QString newPlaylist();
     void removePlaylist(int);
@@ -45,12 +46,19 @@ public:
 private:
     // properties
     std::vector<Playlist> listOfPlaylists;
+    QString currentLoc;
     int playlistInFocus;
     int entryNumSelected;
     int playlistPlaying = -1;
     int entryNumPlaying = -1;
+    int shuffledEntryNumPlaying = -1;
+    int shuffleOn;
+    int repeatOn;
+    std::vector<std::vector<int> > shuffleOrders;
 
     // methods
+    void generateShuffleOrder(int playlistNum);
+    int requestNextFileString();
     QStringList playlistNames();
     QList<int> playlistIDs();
 
@@ -58,11 +66,13 @@ public slots:
     void jumpToFile(int);
     void requestCurrentFile();
     void requestNextFile();
+    void requestNextFileSoon();
     void requestPreviousFile();
     void requestRandomFile();
 
-    signals:
+signals:
     void signalCurrentFile(QString location);
+    void signalCurrentFileSoon(QString location);
     void signalNoMoreFiles();
 };
 

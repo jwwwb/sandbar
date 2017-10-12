@@ -22,7 +22,7 @@
 #include <QUrl>
 
 namespace Ui {
-    class MainWindow;
+class MainWindow;
 }
 
 class MainWindow : public QMainWindow
@@ -60,7 +60,7 @@ private slots:
     void on_pushButtonPrevious_clicked();
     void on_pushButtonRandom_clicked();
     void on_pushButtonStop_clicked();
-    void on_volumeSlider_sliderMoved(int position);
+    void on_volumeSlider_sliderMoved(int position);    
 
 
 private:
@@ -74,17 +74,16 @@ private:
 
 
     // properties
-    int currentPlaylist;
+    int playlistInFocus;
     std::vector<int> listOfPlaylistIDs;
     std::vector<QString> listOfPlaylistNames;
-    std::vector<QWidget *> listOfPlaylistPages;
     QTableWidget *playlistTableWidget; // just one now, that moves.
     Model *model;
     PlaybackController *playback;
     Ui::MainWindow *ui;
     int freezeUpdates = 0;
 
-    signals:
+signals:
     void signalNextPushed();
     void signalPreviousPushed();
 };

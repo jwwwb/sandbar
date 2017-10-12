@@ -11,20 +11,21 @@
 #include <sstream> // stringstream
 
 MainWindow::MainWindow(QWidget *parent) :
-        QMainWindow(parent),
-        ui(new Ui::MainWindow)
+    QMainWindow(parent),
+    ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     model = new Model();
     ui->statusBar->addWidget(ui->statusLabel);
-    currentPlaylist = -1;
+    playlistInFocus = -1;
     playback = new PlaybackController();
-    initalizePlaylistTable();
+
     QCoreApplication::setOrganizationName("jwwwb");
     QCoreApplication::setOrganizationDomain("jwwwb.com");
     QCoreApplication::setApplicationName("Sandbar");
     connectSignals();
     ui->playlistTabs->setUsesScrollButtons(true);
+    initalizePlaylistTable();
     if (ui->playlistTabs->count() == 0) { newPlaylist(); }
 
     QSettings settings;
@@ -46,21 +47,29 @@ MainWindow::~MainWindow()
 void MainWindow::connectSignals()
 {
     // ui to model
-    connect(this, SIGNAL(signalNextPushed()), model, SLOT(requestNextFile()));
+    connect(this, SIGNAL(signalNextPushed(bool)), model, SLOT(requestNextFile()));
     connect(this, SIGNAL(signalPreviousPushed()), model, SLOT(requestPreviousFile()));
 
     // model to playback
     connect(model, SIGNAL(signalCurrentFile(QString)), playback->decoder, SLOT(slotFile(QString)));
+    connect(model, SIGNAL(signalCurrentFileSoon(QString)), playback->decoder, SLOT(slotFileSoon(QString)));
     connect(model, SIGNAL(signalNoMoreFiles()), playback->decoder, SLOT(slotStop()));
 
     // playback to model
     connect(playback->decoder, SIGNAL(signalRequestFile()), model, SLOT(requestCurrentFile()));
-    connect(playback->decoder, SIGNAL(signalFileEnded()), model, SLOT(requestNextFile()));
+    connect(playback->decoder, SIGNAL(signalFileReadEnded()), model, SLOT(requestNextFileSoon()));
 
     // status updates
     connect(playback->decoder, SIGNAL(signalDuration(qlonglong)), this, SLOT(slotDuration(qlonglong)));
     connect(playback->decoder, SIGNAL(signalPlaybackProgress(qlonglong)), this, SLOT(slotPlaybackProgress(qlonglong)));
-    connect(playback->decoder, SIGNAL(signalFileEnded()), this, SLOT(slotPlaybackEnded()));
+//    connect(playback->decoder, SIGNAL(signalFileEnded()), this, SLOT(slotPlaybackEnded()));      // calling this now is too early
+
+
+    // playlist table widget
+    // TODO move first two to ui designer
+    connect(ui->playlistTableWidget->horizontalHeader(), SIGNAL(sectionResized(int,int,int)), this, SLOT(slotColumnResized(int,int,int)));
+    connect(ui->playlistTableWidget, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(rightClickPlaylist(const QPoint&)));
+    connect(ui->playlistTableWidget, SIGNAL(cellDoubleClicked(int,int)), model, SLOT(jumpToFile(int)));
 
     // TODO connect finishedPlaying to something that kills the progressSlider
 }
@@ -70,14 +79,13 @@ void MainWindow::deletePlaylist(int index)
     model->removePlaylist(index);
     listOfPlaylistIDs.erase(listOfPlaylistIDs.begin()+index);
     listOfPlaylistNames.erase(listOfPlaylistNames.begin()+index);
-    listOfPlaylistPages.erase(listOfPlaylistPages.begin()+index);
-    currentPlaylist = model->getInFocusPlaylistIndex();
+    playlistInFocus = model->getInFocusPlaylistIndex();
 }
 
 QList<int> MainWindow::getSelectedInPlaylist()
 {
     QList<int> selecteds;
-    QItemSelectionModel *select = playlistTableWidget->selectionModel();
+    QItemSelectionModel *select = ui->playlistTableWidget->selectionModel();
     if (select->hasSelection()) {
         for (int i = 0; i < select->selectedRows().size(); ++i) {
             selecteds << select->selectedRows().at(i).row();
@@ -88,6 +96,7 @@ QList<int> MainWindow::getSelectedInPlaylist()
 
 void MainWindow::initalizePlaylistTable()
 {
+    // TODO some of this can now be moved to the UI designer.
     QStringList columnHeaders;
     QSettings settings;
 //    settings.clear();
@@ -108,36 +117,27 @@ void MainWindow::initalizePlaylistTable()
         qDebug() << "storing column widths settings";
     }
     columnHeaders.prepend("Playing");
-    playlistTableWidget = new QTableWidget(0, columnHeaders.size());
+    ui->playlistTableWidget->setColumnCount(columnHeaders.size());
     int columnIndex = 0;
     for (QVariant width : columnWidths) {
-        playlistTableWidget->setColumnWidth(columnIndex, width.toInt());
+        ui->playlistTableWidget->setColumnWidth(columnIndex, width.toInt());
         ++columnIndex;
     }
-    playlistTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
-    playlistTableWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-    playlistTableWidget->setHorizontalHeaderLabels(columnHeaders);
-    playlistTableWidget->setAcceptDrops(true);
-    connect(playlistTableWidget->horizontalHeader(), SIGNAL(sectionResized(int,int,int)), this, SLOT(slotColumnResized(int,int,int)));
-    connect(playlistTableWidget, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(rightClickPlaylist(const QPoint&)));
-    connect(playlistTableWidget, SIGNAL(cellDoubleClicked(int,int)), model, SLOT(jumpToFile(int)));
+    ui->playlistTableWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+    ui->playlistTableWidget->setHorizontalHeaderLabels(columnHeaders);
+    ui->playlistTableWidget->setAcceptDrops(true);
 }
 
 void MainWindow::newPlaylist()
 {
-    QWidget *page = new QWidget();
-    QGridLayout *layout2 = new QGridLayout;
-    page->setLayout(layout2);
     QString newListName = model->newPlaylist();
-    ui->playlistTabs->addTab(page, newListName);
-    currentPlaylist = ui->playlistTabs->count()-1;
-    ui->playlistTabs->setCurrentIndex(currentPlaylist);
+    ui->playlistTabs->addTab(new QWidget(), newListName);
+    playlistInFocus = ui->playlistTabs->count()-1;
+    ui->playlistTabs->setCurrentIndex(playlistInFocus);
     listOfPlaylistIDs.push_back(ui->playlistTabs->count()-1);
     listOfPlaylistNames.push_back(newListName);
-    listOfPlaylistPages.push_back(page);
-    page->layout()->addWidget(playlistTableWidget);
-    playlistTableWidget->setRowCount(0);
-    playlistTableWidget->clearContents();
+    ui->playlistTableWidget->setRowCount(0);
+    ui->playlistTableWidget->clearContents();
 }
 
 void MainWindow::updatePlaylist()
@@ -150,17 +150,16 @@ void MainWindow::updatePlaylist()
         columnHeaders << "Artist Name" << "Track Title" << "Album Title" << "Duration" << "File Path";
         settings.setValue("column_headers", columnHeaders);
     }
-    if (ui->playlistTabs->count() <= currentPlaylist) { return; }
-    ui->playlistTabs->setCurrentIndex(currentPlaylist);
+    if (ui->playlistTabs->count() <= playlistInFocus) { return; }
+    ui->playlistTabs->setCurrentIndex(playlistInFocus);
     QTableWidgetItem *item = NULL;
     if (!model->getInFocusPlaylist().empty()) {
-        qDebug() << "update playlist is trying to populate the tablewidget";
-        playlistTableWidget->setRowCount(model->getInFocusPlaylist().size());
+        ui->playlistTableWidget->setRowCount(model->getInFocusPlaylist().size());
         int rowIndex = 0;
         for (MediaFile *media : model->getInFocusPlaylist().mediaFiles) {
             QTableWidgetItem *i = new QTableWidgetItem("");
             i->setFlags(i->flags() &  ~Qt::ItemIsEditable);
-            playlistTableWidget->setItem(rowIndex, 0, i);
+            ui->playlistTableWidget->setItem(rowIndex, 0, i);
             int columnIndex = 1; // start at 1, because 0 is "Playing"
             for (QString key : columnHeaders) {
                 if (media->allData.contains(key)) {
@@ -169,15 +168,14 @@ void MainWindow::updatePlaylist()
                     item = new QTableWidgetItem("");
                 }
                 item->setFlags(item->flags() &  ~Qt::ItemIsEditable);
-                playlistTableWidget->setItem(rowIndex, columnIndex, item);
+                ui->playlistTableWidget->setItem(rowIndex, columnIndex, item);
                 columnIndex++;
             }
             rowIndex++;
         }
-        qDebug() << "all files added";
     } else {
-        playlistTableWidget->clearContents();
-        playlistTableWidget->setRowCount(0);
+        ui->playlistTableWidget->clearContents();
+        ui->playlistTableWidget->setRowCount(0);
     }
 }
 
@@ -191,19 +189,26 @@ void MainWindow::playPlaylistEntry()
 
 void MainWindow::rightClickPlaylist(const QPoint & pos)
 {
-    QPoint globalPos = playlistTableWidget->viewport()->mapToGlobal(pos);
+    QPoint globalPos = ui->playlistTableWidget->viewport()->mapToGlobal(pos);
     QMenu rightClickMenu;
     // TODO adjust the actions based on which songs are selected
 
     QList<int> selected = getSelectedInPlaylist();
     if (selected.size() == 1) {
         rightClickMenu.addAction(QString("Play"), this, SLOT(playPlaylistEntry()));
-        rightClickMenu.addAction("Delete");
-        rightClickMenu.addAction("Properties");
+        rightClickMenu.addSeparator();
+        rightClickMenu.addAction("Remove");
+        rightClickMenu.addAction("Crop");
     } else {
-        rightClickMenu.addAction(QString("Delete %1 Files").arg(selected.size()));
-        rightClickMenu.addAction("Properties");
+        rightClickMenu.addAction(QString("Remove %1 Files").arg(selected.size()));
+        rightClickMenu.addAction(QString("Crop to %1 Files").arg(selected.size()));
     }
+    rightClickMenu.addSeparator();
+    rightClickMenu.addAction("Cut");
+    rightClickMenu.addAction("Copy");
+    rightClickMenu.addAction("Paste");
+    rightClickMenu.addSeparator();
+    rightClickMenu.addAction("Properties");
     QAction* selectedItem = rightClickMenu.exec(globalPos);
     // I might not need this section at all:
     if (selectedItem)
@@ -258,14 +263,14 @@ void MainWindow::slotPlaybackProgress(qlonglong timePlayed)
         ui->progressSlider->setValue((int)(timePlayed*uSecToSliderStep));
     }
 //    qDebug() << "received new progress of" << timePlayed;
-    qlonglong phours = (qlonglong)floor((double)timePlayed/(3600.0 * AV_TIME_BASE));
-    int pmins = (int)floor((timePlayed-AV_TIME_BASE*phours*3600)/(60*AV_TIME_BASE));
-    int psecs = (int)floor((timePlayed-AV_TIME_BASE*(phours*3600+pmins*60))/AV_TIME_BASE);
+    qlonglong phours = (qlonglong)floor((double)timePlayed/(3600.0 * timeBase));
+    int pmins = (int)floor((timePlayed-timeBase*phours*3600)/(60*timeBase));
+    int psecs = (int)floor((timePlayed-timeBase*(phours*3600+pmins*60))/timeBase);
 
     qlonglong dur = playback->getDuration();
-    qlonglong dhours = (qlonglong)floor((double)dur/(3600.0 * AV_TIME_BASE));
-    int dmins = (int)floor((dur-AV_TIME_BASE*dhours*3600)/(60*AV_TIME_BASE));
-    int dsecs = (int)floor((dur-AV_TIME_BASE*(dhours*3600+dmins*60))/AV_TIME_BASE);
+    qlonglong dhours = (qlonglong)floor((double)dur/(3600.0 * timeBase));
+    int dmins = (int)floor((dur-timeBase*dhours*3600)/(60*timeBase));
+    int dsecs = (int)floor((dur-timeBase*(dhours*3600+dmins*60))/timeBase);
 
     QString status = QString("%0:%1:%2 / %3:%4:%5").arg(phours).arg(pmins, 2, 10, QChar('0')).arg(psecs, 2, 10, QChar('0')).arg(dhours).arg(dmins, 2, 10, QChar('0')).arg(dsecs, 2, 10, QChar('0'));
     ui->statusLabel->setText(status);
@@ -278,11 +283,8 @@ void MainWindow::on_actionAdd_File_triggered()
     QStringList fileNames = QFileDialog::getOpenFileNames(this, "Add File(s)", QString(getenv("HOME"))+"/Music", "Audio Files (*.mp3 *.flac *.ogg *.wav)");
     if (!fileNames.isEmpty()) {
         for (QString fileName : fileNames) {
-            qDebug() << "trying to create MediaFile with filename:" << fileName;
             MediaFile *mediaFile = new MediaFile(fileName);
-            qDebug() << "made it, adding to playlist";
             model->addToPlaylist(mediaFile);
-            qDebug() << "added";
         }
         this->updatePlaylist();
     }
@@ -309,14 +311,9 @@ void MainWindow::on_actionOpen_triggered()
 
 void MainWindow::on_playlistTabs_currentChanged(int index)
 {
-    currentPlaylist = index;
+    playlistInFocus = index;
     model->switchPlaylist(index);
-    // only do this when switching to an existing playlist, not when creating a new one.
-    if (listOfPlaylistPages.size() > index) {
-        qDebug() << "attempting to change playlist to" << index << "of" << listOfPlaylistPages.size();
-        listOfPlaylistPages.at(index)->layout()->addWidget(playlistTableWidget);
-        updatePlaylist();
-    }
+    updatePlaylist();
 }
 
 void MainWindow::on_playlistTabs_tabBarDoubleClicked(int index)
@@ -333,13 +330,13 @@ void MainWindow::on_playlistTabs_tabBarDoubleClicked(int index)
 
 void MainWindow::on_playlistTabs_tabCloseRequested(int index)
 {
+    // TODO: prevent program from crashing when closing last tab.
     deletePlaylist(index);
     ui->playlistTabs->removeTab(index);
 }
 
 void MainWindow::on_progressSlider_sliderPressed()
 {
-//    qDebug() << "slider pressed";
     freezeUpdates = 1;
 }
 
@@ -347,7 +344,7 @@ void MainWindow::on_progressSlider_sliderReleased()
 {
     int val = ui->progressSlider->value();
     int pos = ui->progressSlider->sliderPosition();
-    qDebug() << "slider released at value" << val << "and position" << pos;
+//    qDebug() << "slider released at value" << val << "and position" << pos;
     freezeUpdates = 0;
     playback->seekFile(val*sliderStepToUSec);
 }
@@ -360,19 +357,15 @@ void MainWindow::on_pushButtonClear_clicked()
 
 void MainWindow::on_pushButtonHello_clicked()
 {
-    qDebug() << "trying to create MediaFile from mannfred mann";
     MediaFile *mediaFile = new MediaFile("/Users/yames/Music/02. Manfred Mann's Earth Band - Blinded By The Light.flac");
-    qDebug() << "made it, adding to playlist";
     model->addToPlaylist(mediaFile);
-    qDebug() << "added, calling update playlist";
     this->updatePlaylist();
-    qDebug() << "call to update returned.";
 }
 
 void MainWindow::on_pushButtonNext_clicked()
 {
-    emit signalNextPushed();
-//    playback->seekDifferential(5*sample_rate);
+//    emit signalNextPushed();
+    playback->seekDifferential(5*timeBase);
 }
 
 void MainWindow::on_pushButtonPause_clicked()
@@ -387,16 +380,13 @@ void MainWindow::on_pushButtonPlay_clicked()
 
 void MainWindow::on_pushButtonPrevious_clicked()
 {
-    emit signalPreviousPushed();
-//    playback->seekDifferential(-5*sample_rate);
+//    emit signalPreviousPushed();
+    playback->seekDifferential(-5*timeBase);
 }
 
 void MainWindow::on_pushButtonRandom_clicked()
 {
-    // TODO change this to something with random.
-    qDebug() << "pushed seek button";
     model->requestRandomFile();
-//    playback->seekFile(5000000);
 }
 
 void MainWindow::on_pushButtonStop_clicked()

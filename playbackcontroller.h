@@ -19,6 +19,7 @@ class PlaybackController : public QObject
     Q_OBJECT
     QThread decoderThread;
 
+
 public:
     PlaybackController();
     ~PlaybackController();
@@ -54,7 +55,7 @@ private:
     qlonglong fileDuration;
     qlonglong currentProgress;
 
-    signals:
+signals:
     // to decoder
     void playSignal();
     void seekSignal(qlonglong);

@@ -102,7 +102,7 @@ void PortAudioInterface::slotOpenStream()
                                 2,          /* stereo output */
                                 paInt16,    /* 16 bit signed int output */
                                 sample_rate,
-                                256,        /* frames per buffer, i.e. the number
+                                paFramesPerBufferUnspecified,        /* was 256; frames per buffer, i.e. the number
                                                    of sample frames that PortAudio will
                                                    request from the callback. Many apps
                                                    may want to use

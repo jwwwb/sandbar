@@ -13,7 +13,8 @@ Model::Model()
     Playlist *emptyPlaylist = new Playlist(newName);
     this->listOfPlaylists.push_back(*emptyPlaylist);
     playlistInFocus = 0;
-    QSettings settings;
+    shuffleOn = 0;
+    repeatOn = 0;
 }
 
 // public methods
@@ -21,12 +22,25 @@ Model::Model()
 void Model::addToPlaylist(MediaFile *mediaFile)
 {
     getInFocusPlaylist().append(mediaFile);
+    generateShuffleOrder(getInFocusPlaylistIndex());
 }
 
-void Model::changePlaybackOrder(QString order)
+// TODO make an enum for order types
+void Model::changePlaybackOrder(int order)
 {
-    QSettings settings;
-    settings.setValue("playback_order", order);
+    shuffleOn = order;
+    if (!order) shuffledEntryNumPlaying = -1;
+    else {
+        if (entryNumPlaying >= 0) {
+            for (shuffledEntryNumPlaying = 0; shuffledEntryNumPlaying < getPlayingPlaylist().size(); ++shuffledEntryNumPlaying) {
+                if (shuffleOrders.at(getPlayingPlaylistIndex()).at(shuffledEntryNumPlaying) == entryNumPlaying) {
+                    break;
+                }
+            }
+        } else {
+            shuffledEntryNumPlaying = 0;
+        }
+    }
 }
 
 void Model::clearPlaylist()
@@ -69,6 +83,7 @@ void Model::removePlaylist(int index) {
 QString Model::renamePlaylist(QString newName) {
     this->getInFocusPlaylist().setName(newName);
     // TODO: make sure name is unique, and if not, return corrected
+    // Maybe we don't need uniqueness...
     return newName;
 }
 
@@ -98,6 +113,19 @@ int Model::getInFocusPlaylistIndex() {
 
 // private methods
 
+void Model::generateShuffleOrder(int playlistNum)
+{
+    if (shuffleOrders.size() < playlistNum) return;
+    if (shuffleOrders.size() == playlistNum) {
+        shuffleOrders.push_back(std::vector<int>());
+    }
+    if (shuffleOrders.at(playlistNum).size()) shuffleOrders.at(playlistNum).clear();
+    for (int i = 0; i < listOfPlaylists.at(playlistNum).size(); ++i) {
+        shuffleOrders.at(playlistNum).push_back(i);
+    }
+    std::random_shuffle(shuffleOrders.at(playlistNum).begin(), shuffleOrders.at(playlistNum).end());
+}
+
 QStringList Model::playlistNames()
 {
     QStringList playlistNames;
@@ -121,9 +149,16 @@ QList<int> Model::playlistIDs()
 void Model::requestPreviousFile()
 {
     qDebug() << "received previous request";
-    if (entryNumPlaying > 0) {
-        entryNumPlaying--;
-        qDebug() << "not at beginning of playlist, so decrementing counter";
+    if (shuffleOn) {
+        if (!shuffledEntryNumPlaying) shuffledEntryNumPlaying = getPlayingPlaylist().size();
+        --shuffledEntryNumPlaying;
+        entryNumPlaying = shuffleOrders.at(getPlayingPlaylistIndex()).at(shuffledEntryNumPlaying);
+    } else {
+        if (entryNumPlaying > 0) {
+            entryNumPlaying--;
+        } else {
+            if (repeatOn) entryNumPlaying = getPlayingPlaylist().size();
+        }
     }
     QString loc = getPlayingPlaylist().getEntryAt(entryNumPlaying)->location;
     qDebug() << "emitting currentFile signal with" << loc;
@@ -143,15 +178,40 @@ void Model::requestCurrentFile()
 
 void Model::requestNextFile()
 {
-    qDebug() << "received next request";
-    if (getPlayingPlaylist().size() > entryNumPlaying + 1) {
-        entryNumPlaying++;
-        QString currentLoc = getPlayingPlaylist().getEntryAt(entryNumPlaying)->location;
-        qDebug() << "Found more files in the playlist, emitting" << currentLoc;
+    if (requestNextFileString() > 0) {
+        qDebug() << "Found more files in the playlist, emitting now" << currentLoc;
         emit signalCurrentFile(currentLoc);
-    } else {
-        emit signalNoMoreFiles();
     }
+}
+
+void Model::requestNextFileSoon() {
+    if (requestNextFileString() > 0) {
+        qDebug() << "Found more files in the playlist, emitting soon" << currentLoc;
+        emit signalCurrentFileSoon(currentLoc);
+    }
+}
+
+int Model::requestNextFileString() {
+    qDebug() << "received next request";
+    if (shuffleOn) {
+        shuffledEntryNumPlaying = (shuffledEntryNumPlaying + 1) % getPlayingPlaylist().size();
+        entryNumPlaying = shuffleOrders.at(getPlayingPlaylistIndex()).at(shuffledEntryNumPlaying);
+        currentLoc = getPlayingPlaylist().getEntryAt(entryNumPlaying)->location;
+    } else {
+        if (getPlayingPlaylist().size() > entryNumPlaying + 1) {
+            entryNumPlaying++;
+        } else {
+            if (repeatOn) {
+                entryNumPlaying = 0;
+            } else {
+                emit signalNoMoreFiles();
+                return -1;
+            }
+        }
+    }
+    currentLoc = getPlayingPlaylist().getEntryAt(entryNumPlaying)->location;
+    qDebug() << "Found more files in the playlist, setting" << currentLoc;
+    return 1;
 }
 
 void Model::requestRandomFile()
@@ -160,7 +220,6 @@ void Model::requestRandomFile()
     if (getPlayingPlaylistIndex() < 0) playlistPlaying = playlistInFocus;
     if (getPlayingPlaylist().size()) {
         int newNum = qrand();
-        qDebug() << "newNum =" << newNum;
         newNum %= getPlayingPlaylist().size();
         qDebug() << "newNum =" << newNum;
         QString loc = getPlayingPlaylist().getEntryAt(newNum)->location;

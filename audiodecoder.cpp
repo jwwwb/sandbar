@@ -45,6 +45,7 @@ void AudioDecoder::slotInitialize()
         bufferData.buffer[0] = NULL;
         bufferData.bufferLen[0] = 0;
         bufferData.positionInFile[0] = 0;
+        bufferData.fileChangeIndex = -1;
         for (int i=1 ; i<4 ; i++) {
             // doing this so I can throw away and re-alloc individual buffers while keeping others
             // malloc is allocating: 1 (second) * 2 (channels) * 44100 (Hz) * 16 (bits) = 172 kBytes
@@ -63,7 +64,7 @@ void AudioDecoder::slotInitialize()
 void AudioDecoder::slotFile(const QString &fileName)
 {
     qDebug() << "received filename" << fileName << ", loading file.";
-    if (fileOpen) {
+        if (fileOpen) {
         qDebug() << "File is open right now, so finishing file first";
         finishFile();
     }
@@ -71,7 +72,24 @@ void AudioDecoder::slotFile(const QString &fileName)
         timer->start(timer_period);
     }
     qlonglong dur = loadFile(fileName);
+    nextDuration = dur;
     emit signalDuration(dur);
+    qDebug() << "playing back file" << fileName << "of length" << dur;
+}
+
+void AudioDecoder::slotFileSoon(const QString &fileName) {
+    qDebug() << "received filename" << fileName << ", loading file.";
+        if (fileOpen) {
+        qDebug() << "File is open right now, so cleaning up old file";
+        cleanUpFile();
+    }
+    if (!timer->isActive()) {
+        timer->start(timer_period);
+    }
+    qlonglong dur = loadFile(fileName);
+    // TODO: don't emit the duration until the other file has finished playing.
+    nextDuration = dur;
+//    emit signalDuration(dur);
     qDebug() << "playing back file" << fileName << "of length" << dur;
 }
 
@@ -91,25 +109,25 @@ void AudioDecoder::slotPlay()
 
 void AudioDecoder::slotSeekTo(qlonglong time)
 {
-    // TODO this index used to be frames, it's now probably something different
-    // but I no longer remember what.
+    // TODO figure out why the hell some mp3s allegedly don't have headers
+    // and why I can only seek in the very beginning of some mp3s
     int flags = 0;
-    //    flags += AVSEEK_FLAG_FRAME;
-    if (time < currentTime) {
-        // todo add backwards seek flag.
+//    flags += AVSEEK_FLAG_FRAME;
+    flags += AVSEEK_FLAG_ANY;
+    if (time < getTime()) {
         flags += AVSEEK_FLAG_BACKWARD;
     }
 
     int desired_seek = (int)(time*bufferData.uSecToTrackTimeBase);
     int min_seek = (int)((time-2*cache_duration)*bufferData.uSecToTrackTimeBase);
     avformat_seek_file(formatContext, audioStream, min_seek, desired_seek,
-            desired_seek, flags);
+                       desired_seek, flags);
     fillUpBuffer(1);
 }
 
 void AudioDecoder::slotSetVolume(float newVolume)
 {
-    // may have some lag? not guaranteed to be atomic, since 64 bit dtype:
+    // may have some lag? not guaranteed to be atomic, since 32 bit dtype:
     // http://preshing.com/20130618/atomic-vs-non-atomic-operations/
     bufferData.volume = newVolume;
 }
@@ -117,7 +135,6 @@ void AudioDecoder::slotSetVolume(float newVolume)
 void AudioDecoder::slotStop()
 {
     qDebug() << "decoder received stop signal";
-    // TODO stop timer regardless?
     if (fileOpen) {
         qDebug() << "file is currently open, so stopping everything.";
         bufferData.nextReadBuffer = 0;
@@ -145,24 +162,29 @@ void AudioDecoder::slotTryToProgress()
 
 // private methods
 
-void AudioDecoder::finishFile()
+void AudioDecoder::cleanUpFile()
 {
-    bufferData.nextReadBuffer = 0; // switch it to playing 0s
-    bufferData.switchBuffer = 1;
     // File complete, clean up leftover resample data.
     int out_delay = avresample_get_delay(resampleContext);
     while (out_delay) {
         fprintf(stderr, "Flushed %d delayed resampler samples.\n", out_delay);
         out_samples = avresample_get_out_samples(resampleContext, out_delay);
         av_samples_alloc(&output, &out_linesize, num_channels,
-                         out_delay, (AVSampleFormat)out_sample_fmt, 0);
+                out_delay, (AVSampleFormat)out_sample_fmt, 0);
         out_delay = avresample_convert(resampleContext, &output, out_linesize,
-                                       out_delay, NULL, 0, 0);
+                out_delay, NULL, 0, 0);
         free(output);
     }
     av_frame_free(&frm);
     av_free_packet(&pkt);
     // set local variables
+}
+
+void AudioDecoder::finishFile()
+{
+    bufferData.nextReadBuffer = 0; // switch it to playing 0s
+    bufferData.switchBuffer = 1;
+    cleanUpFile();
     fileOpen = 0;
     emit finishedPlaying(); // this one stops the streamer
     qDebug() << "file finished (forced or naturally), set fileOpen to 0";
@@ -190,9 +212,12 @@ void AudioDecoder::fillUpBuffer(int switchBuffer = 0)
         }
         if (samplesRead < 0) {
             // file complete.
-            finishFile();
+            // TODO: don't finish the file so abruptly, wait for it to finish playing. Currently chops off the last 7 seconds or so.
+//            finishFile();
+            cleanUpFile();
             qDebug() << "file finished naturally, requesting next file";
-            emit signalFileEnded(); // this one requests a new file, don't do this after stop button
+            emit signalFileReadEnded(); // this one requests a new file, don't do this after stop button
+            // the rest of finishFile still has to occur here, but only if file ended triggers a "signalNoMoreFiles"
             return;
         } else {
             // get the WB'th buffer, and jump to cur_buf_len*2 (so after one loop, 8192*16bit)
@@ -220,12 +245,18 @@ qlonglong AudioDecoder::getTime()
 }
 
 qlonglong AudioDecoder::loadFile(const QString &fileName) {
+    qlonglong duration;
+    duration = enqueueFile(fileName);
+    bufferData.switchBuffer = 1;
+    return duration;
+}
 
+qlonglong AudioDecoder::enqueueFile(const QString &fileName) {
     if (formatContext != NULL)
         avformat_close_input(&formatContext);
     // Try and open up the file (check if file exists).
     int error = avformat_open_input(&formatContext,
-                                    fileName.toStdString().c_str(), NULL, NULL);
+                fileName.toStdString().c_str(), NULL, NULL);
     if (error < 0) {
         qDebug() << "Could not open input file." << fileName;
         qDebug() << "Error code:" << error;
@@ -241,6 +272,9 @@ qlonglong AudioDecoder::loadFile(const QString &fileName) {
 
     // If there are multiple streams in the file, find the best one
     // TODO what is the best one?
+    int best = av_find_best_stream(formatContext, AVMEDIA_TYPE_AUDIO, -1, -1, NULL, 0);
+    qDebug() << "best stream is apparently" << best;
+
     for (int i=0; i < formatContext->nb_streams; ++i) {
         if (formatContext->streams[i]->codec->codec_type==AVMEDIA_TYPE_AUDIO) {
             audioStream = i;
@@ -250,7 +284,7 @@ qlonglong AudioDecoder::loadFile(const QString &fileName) {
     }
     if (audioStream == -1) {
         qDebug() << "Could not find one audio input stream, among the"
-                 << formatContext->nb_streams;
+                << formatContext->nb_streams;
         avformat_close_input(&formatContext);
         return 0;
     }
@@ -266,7 +300,7 @@ qlonglong AudioDecoder::loadFile(const QString &fileName) {
 
     // And lets open the decoder.
     error = avcodec_open2(formatContext->streams[audioStream]->codec,
-                          deCodec, NULL);
+            deCodec, NULL);
     if (error < 0) {
         qDebug() << "Could not open input deCodec.";
         avformat_close_input(&formatContext);
@@ -315,25 +349,25 @@ qlonglong AudioDecoder::loadFile(const QString &fileName) {
     // We need to use this "getter" for the output sample format.
     av_opt_get_int(resampleContext, "out_sample_fmt", 0, &out_sample_fmt);
 
-    // pkt = { 0 };
+//    pkt = { 0 };
     av_init_packet(&pkt);
     frm = av_frame_alloc();
     currentTime = 0;
     bufferData.trackTimeBaseToUSec = (float)formatContext->streams[audioStream]->time_base.num /
-                                     (float)formatContext->streams[audioStream]->time_base.den * 1000000.0;
+            (float)formatContext->streams[audioStream]->time_base.den * 1000000.0;
     bufferData.uSecToTrackTimeBase = (float)formatContext->streams[audioStream]->time_base.den /
-                                     (float)formatContext->streams[audioStream]->time_base.num / 1000000.0;
+            (float)formatContext->streams[audioStream]->time_base.num / 1000000.0;
     bufferData.trackTimeBaseToOutSampleIndex = (float)formatContext->streams[audioStream]->time_base.num /
-                                               (float)formatContext->streams[audioStream]->time_base.den * sample_rate;
+            (float)formatContext->streams[audioStream]->time_base.den * sample_rate;
     bufferData.outSampleIndexToTrackTimeBase = (float)formatContext->streams[audioStream]->time_base.den /
-                                               (float)formatContext->streams[audioStream]->time_base.num / sample_rate;
+            (float)formatContext->streams[audioStream]->time_base.num / sample_rate;
 
     fileOpen = 1;
     qDebug() << "file loaded successfully, setting fileOpen to 1";
 
     // start reading the file and then tell portaudio to start playing it
     fillUpBuffer(0);
-    bufferData.switchBuffer = 1;
+
     duration = formatContext->duration;
     emit bufferReadyForPlayback();
     return duration; // number of samples the song is long
@@ -362,19 +396,19 @@ int AudioDecoder::readNextPacket()
 
     // Calculate how many samples we will have after resampling.
     out_samples = avresample_get_out_samples(resampleContext,
-                                             frm->nb_samples);
+            frm->nb_samples);
 
     // Allocate our output buffer.
     // this motherfucker wants &output to be a uint8_t**, that's why
     // I can't make my output buffer be the type it actually is.
     av_samples_alloc(&output, &out_linesize, num_channels,
-                     out_samples, (AVSampleFormat)out_sample_fmt, 0);
+            out_samples, (AVSampleFormat)out_sample_fmt, 0);
 
     // Resample the audio data and store it in our output buffer.
 
     out_samples = avresample_convert(resampleContext, &output,
-                                     out_linesize, out_samples, frm->extended_data,
-                                     frm->linesize[0], frm->nb_samples);
+            out_linesize, out_samples, frm->extended_data,
+            frm->linesize[0], frm->nb_samples);
 
     // This is why we store out_samples again, some issues may
     // have occured.

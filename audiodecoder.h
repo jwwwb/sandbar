@@ -24,7 +24,7 @@ extern "C" {
 class AudioDecoder : public QObject
 {
     Q_OBJECT
-            QThread decoderThread;
+    QThread decoderThread;
 public:
     AudioDecoder();
     ~AudioDecoder();
@@ -51,13 +51,16 @@ private:
     int audioStream = -1;
     QTimer *timer;
     qlonglong duration;
+    qlonglong nextDuration;
     qlonglong currentTime;
 
 // methods
 private:
     void fillUpBuffer(int switchBuffer);
     void finishFile(); // this combines cleanUp and the rest in one func.
+    void cleanUpFile(); // has to be split after all, cause otherwise it stops too soon
     qlonglong getTime();
+    qlonglong enqueueFile(const QString &);
     qlonglong loadFile(const QString &); // TODO don't pass this, use property
     int readNextPacket();
 
@@ -67,6 +70,7 @@ public slots:
 
     // from model
     void slotFile(const QString &fileName);
+    void slotFileSoon(const QString &fileName);
 
     // from playback controller
     void slotPlay();    // combine these two
@@ -78,8 +82,8 @@ public slots:
     void slotTryToProgress();
 
 
-    signals:
-    // to playbackcontroller
+signals:
+    // to mainwindow now, I think?
     void signalDuration(qlonglong duration);
     void signalPlaybackProgress(qlonglong timePlayed);
 
@@ -87,9 +91,10 @@ public slots:
     void bufferReadyForPlayback();
     void finishedPlaying();
 
-    // what?
+    // to model mostly, I think
     void signalRequestFile(); // TODO: do this earlier
-    void signalFileEnded();
+    // this one is mainwindow, or at least soon to be, for sure.
+    void signalFileReadEnded();
 };
 
 #endif // AUDIODECODER_H
